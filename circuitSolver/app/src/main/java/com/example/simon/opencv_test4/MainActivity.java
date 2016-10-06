@@ -13,7 +13,12 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+
+import static org.opencv.imgproc.Imgproc.COLOR_GRAY2BGR;
+import static org.opencv.imgproc.Imgproc.cvtColor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,10 +56,34 @@ public class MainActivity extends AppCompatActivity {
         Mat tmp2 = new Mat (bMap.getWidth(), bMap.getHeight(), CvType.CV_8UC1);
         Utils.bitmapToMat(bMap, tmp);
         Imgproc.Canny(tmp, tmp2, 50, 200);
+        Mat tmp3 = new Mat (bMap.getWidth(), bMap.getHeight(), CvType.CV_8UC1);
 
-        Bitmap bm = Bitmap.createBitmap(tmp2.cols(), tmp2.rows(),Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(tmp2, bm);
 
+        Mat lines = new Mat();
+        Imgproc.HoughLinesP(tmp2,lines,1,Math.PI/180,0);
+
+        cvtColor(tmp2, tmp3, COLOR_GRAY2BGR);
+        //Drawing the lines into the mat
+
+        for (int x = 0; x < lines.rows(); x++)
+        {
+            double[] vec = lines.get(x, 0);
+            double x1 = vec[0],
+                    y1 = vec[1],
+                    x2 = vec[2],
+                    y2 = vec[3];
+            Point start = new Point(x1, y1);
+            Point end = new Point(x2, y2);
+
+            Imgproc.line(tmp3, start, end, new Scalar(255,0,0), 3);
+
+        }
+
+        Bitmap bm = Bitmap.createBitmap(tmp3.cols(), tmp3.rows(),Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(tmp3, bm);
+        tmp.release();
+        tmp2.release();
+        tmp3.release();
         return bm;
     }
 
