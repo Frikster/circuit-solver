@@ -10,7 +10,7 @@ import java.util.Comparator;
  * Created by Simon on 19.10.2016.
  */
 
-public class LinesComparator implements Comparator<double[]> {
+public class LinesComparatorYX implements Comparator<double[]> {
     @Override
     public int compare(double[] a, double[] b){
         if(a[1]>b[1]){
