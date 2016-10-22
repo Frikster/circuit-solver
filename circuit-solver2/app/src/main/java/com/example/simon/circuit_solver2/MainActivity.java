@@ -2,13 +2,13 @@ package com.example.simon.circuit_solver2;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     Button loadBtn;
     ImageView myIm;
 
+    TextView loadingMsg;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +46,20 @@ public class MainActivity extends AppCompatActivity {
 
         loadBtn = (Button) findViewById(R.id.button);
         myIm = (ImageView) findViewById(R.id.myImage);
+        loadingMsg = (TextView) findViewById(R.id.textView);
 
-       //buttonPress(houghCirclesProbabilistic());
-        buttonPress(houghLines());
 
-    }
-
-    public void buttonPress(Bitmap bm){
-        final Bitmap bm1 = bm;
         loadBtn.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View v) {
-                myIm.setImageBitmap(bm1);
+
+                loadBtn.setEnabled(false);
+                Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.mipmap.circuitcomp33);
+                Bitmap m = houghLines(bMap);
+                myIm.setImageBitmap(m);
+                loadingMsg.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -66,15 +70,16 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return the bitmap with the detected lines and a circle around the components
      */
-    public Bitmap houghLines(){
+    public Bitmap houghLines(Bitmap bMap){
 
         //Convert to a canny edge detector grayscale mat
-        Bitmap bMap = BitmapFactory.decodeResource(getResources(), R.mipmap.circuitwithcircle);
+        boolean aLotOfComponents = false;
         Mat tmp = new Mat (bMap.getWidth(), bMap.getHeight(), CvType.CV_8UC1);
         Mat tmp2 = new Mat (bMap.getWidth(), bMap.getHeight(), CvType.CV_8UC1);
         Utils.bitmapToMat(bMap, tmp);
         Imgproc.Canny(tmp, tmp2, 50, 200);
-       Mat tmp3 = new Mat (bMap.getWidth(), bMap.getHeight(), CvType.CV_8UC1);
+
+        Mat tmp3 = new Mat (bMap.getWidth(), bMap.getHeight(), CvType.CV_8UC1);
 
         //Execute the hough transform on the canny edge detector
         Mat lines = new Mat();
@@ -85,22 +90,43 @@ public class MainActivity extends AppCompatActivity {
         //remove chunks from hough transform and make one line from them
         List<double[]> smoothedLines = smoothLines(MatToList(lines));
 
-        TuplePoints resLinesAndComponents = circlesAroundComponentsByVote(smoothedLines,tmp3, 10, 40,10);
+
+        int maxVote,minVote,radiusInComponent,distCompCorner,maxLinesToBeChunk;
+
+
+        if(aLotOfComponents){
+            maxVote = 35;
+            minVote = 8;
+            radiusInComponent = 10;
+            distCompCorner = 10;
+            maxLinesToBeChunk = 2;
+        }
+        else{
+            maxVote = 40;
+            minVote = 12;
+            radiusInComponent = 13;
+            distCompCorner = 15;
+            maxLinesToBeChunk = 3;
+        }
+
+
+        TuplePoints resLinesAndComponents = circlesAroundComponentsByVote(smoothedLines,tmp3, minVote, maxVote,radiusInComponent,maxLinesToBeChunk);
         List<double[]> residualLines = resLinesAndComponents.getFirst();
         List<double[]> components = resLinesAndComponents.getSecond();
 
-        List<double[]> residualLinesWithoutChunk= removeChunks(residualLines, 3);
+        List<double[]> residualLinesWithoutChunk= removeChunks(residualLines, maxLinesToBeChunk);
         List<double[]> withoutBorders = removeImageBorder(residualLinesWithoutChunk);
         List<double[]> verticalLines = verticalLines(withoutBorders);
         List<double[]> horizontalLines = horizontalLines(withoutBorders);
 
-        List<double[]> corners = findCorners(verticalLines,horizontalLines);
+        List<double[]> corners = findCorners(verticalLines,horizontalLines,10);
 
-        List<double[]> singleCorners = singleCorners(corners,10);
-        List<double[]> validCorners = removeCornersTooNearFromComponent(singleCorners, components, 10);
+        List<double[]> singleCorners = singleCorners(corners,8);
+        List<double[]> validCorners = removeCornersTooNearFromComponent(singleCorners, components, distCompCorner);
         drawCircles(tmp3,validCorners, new Scalar(0,255,0));
         drawCircles(tmp3,components, new Scalar(255,0,0));
 
+        System.out.println("Nr of corners : "+validCorners.size());
         //eliminer les corners trop près des components
 
 
@@ -130,9 +156,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        //Detect the components and draw circle around them
-
-
         //Create and return the final bitmap
         Bitmap bm = Bitmap.createBitmap(tmp3.cols(), tmp3.rows(),Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(tmp3, bm);
@@ -141,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
         tmp3.release();
         return bm;
     }
+
+
 
     private List<double[]> removeCornersTooNearFromComponent(List<double[]> corners, List<double[]> components, int minDistance){
         List<double[]> validCorners = new ArrayList<>();
@@ -228,8 +253,8 @@ public class MainActivity extends AppCompatActivity {
         return line;
     }
 
-    private List<double[]> findCorners(List<double[]> verticals, List<double[]> horizontals){
-        int searchRadius = 7;
+    private List<double[]> findCorners(List<double[]> verticals, List<double[]> horizontals, int searchRadius){
+
         List<double[]> corners = new ArrayList<>();
         Collections.sort(verticals,new LinesComparatorYX());
         Collections.sort(horizontals,new LinesComparatorYX());
@@ -247,14 +272,14 @@ public class MainActivity extends AppCompatActivity {
                 if(Math.abs(y11-y12)<= searchRadius){
                     double[] point = new double[3];
                     point[0]=x11;
-                    point[1]=y11;
+                    point[1]=y12;
                     point[2]=10;
                     corners.add(point);
                 }
                 else if(Math.abs(y21-y12) <=searchRadius){
                     double[] point = new double[3];
                     point[0]=x11;
-                    point[1]=y21;
+                    point[1]=y22;
                     point[2]=10;
                     corners.add(point);
                 }
@@ -317,6 +342,15 @@ public class MainActivity extends AppCompatActivity {
         circles.add(circle);
         drawCircles(toDraw, circles, new Scalar(0,255,0));
      }
+
+    private boolean lineIsChunk(double[] line, int maxToBeChunk){
+        double x1 = line[0];
+        double y1 = line[1];
+        double x2 = line[2];
+        double y2 = line[3];
+
+        return Math.abs(x1-x2)<=maxToBeChunk && Math.abs(y1-y2)<=maxToBeChunk;
+    }
     /**
      *
      * @param lines containing all the lines
@@ -324,8 +358,9 @@ public class MainActivity extends AppCompatActivity {
      * @param minLinesVote The min nr of lines a component must have to be recognized as a component
      * @param maxLinesVote The max nr of lines a component must have to be recognized as a component
      * @param radius has to be set to smaller if the components are small and close
+     * @param maxToBeChunk all lines bigger than this are real lines
      */
-    private TuplePoints circlesAroundComponentsByVote(List<double[]> lines, Mat imageToWriteOn, int minLinesVote, int maxLinesVote, int radius){
+    private TuplePoints circlesAroundComponentsByVote(List<double[]> lines, Mat imageToWriteOn, int minLinesVote, int maxLinesVote, int radius, int maxToBeChunk){
         List<double[]> linesCopy = new ArrayList<>(lines);
         List<double[]> componentsFound = new ArrayList<>();
 
@@ -339,7 +374,9 @@ public class MainActivity extends AppCompatActivity {
                     for (double[] line : linesCopy) {
                         if (Math.sqrt(Math.pow(i - line[0], 2) + Math.pow(j - line[1], 2)) < radius) {
                             vote++;
-                            potentialLinesInComponent.add(line);
+                            if(lineIsChunk(line, maxToBeChunk)) {
+                                potentialLinesInComponent.add(line);
+                            }
                         }
                     }
                     //if the nr of lines around is sufficent, add the component to the found component and delete it from the found lines

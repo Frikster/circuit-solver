@@ -13,8 +13,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Loading..."
+        android:visibility="visible"
         android:id="@+id/textView"/>
+
 
     <Button
         android:text="load image"
