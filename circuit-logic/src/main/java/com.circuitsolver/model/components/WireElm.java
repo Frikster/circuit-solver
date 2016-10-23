@@ -1,6 +1,4 @@
-package model.components;
-
-import static util.Constants.*;
+package com.circuitsolver.model.components;
 
 /**
  * Created by Jennifer on 10/12/2016.
@@ -21,7 +19,9 @@ public class WireElm extends CircuitElm {
         //TODO: throw an IllegalEditWireValueException
     }
 
-    public ElmType getType() {
-        return ElmType.WIRE;
+    @Override
+    public String getType() {
+        return null;
     }
+
 }

@@ -1,4 +1,4 @@
-package model;
+package com.circuitsolver.service;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 /**
  * Created by Jennifer on 10/13/2016.
  */
-public class CircuitImplTest {
+public class CircuitSimImplTest {
 
     @Test
     public void testGetCurrent_twoNodeCircuit_returnsResistorCurrent(){

@@ -1,7 +1,6 @@
-package service;
+package com.circuitsolver.io;
 
-import model.*;
-import model.components.*;
+import com.circuitsolver.model.components.*;
 
 import java.awt.*;
 import java.io.File;
@@ -13,24 +12,13 @@ import java.util.List;
  *
  * Takes the pseudo-spice txt file representing circuit interpreted from opencv and parses it into Circuit elements
  */
-public class PseudoSpiceParser implements CircuitParser{
+public class CircuitReaderTxtImpl implements CircuitReader {
 
     private List<CircuitElm> elements;
 
-    public void parse(File f){
-        List<Point> points = new ArrayList<Point>(); //tracks all points (coordinates where components intersect)
-        //For each line...
-        //CircuitElm elm = parseLineToElm(line)
-        //elements.add(elm)
-        //Add any new points discovered
-        //The negative terminal of the first V source discovered is ground node
-        //
-        //parseNodes()
-        //TODO
-    }
-
-    public List<CircuitElm> getElements(){
-        return null; //TODO
+    @Override
+    public List<CircuitElm> read(File f) throws InvalidCircuitFileException {
+        return null;
     }
 
     //Constructs circuit element from line

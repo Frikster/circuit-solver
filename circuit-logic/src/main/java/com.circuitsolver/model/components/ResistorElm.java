@@ -1,6 +1,5 @@
-package model.components;
+package com.circuitsolver.model.components;
 
-import static util.Constants.*;
 
 /**
  * Created by Jennifer on 10/12/2016.
@@ -25,7 +24,9 @@ public class ResistorElm extends CircuitElm {
         this.resistance = value;
     }
 
-    public ElmType getType() {
-        return ElmType.RESISTOR;
+    @Override
+    public String getType() {
+        return null;
     }
+
 }

@@ -1,6 +1,4 @@
-package model.components;
-
-import static util.Constants.*;
+package com.circuitsolver.model.components;
 
 /**
  * Created by Jennifer on 10/12/2016.
@@ -25,7 +23,9 @@ public class VoltageElm extends CircuitElm {
         this.voltage = value;
     }
 
-    public ElmType getType() {
-        return ElmType.DC_VOLTAGE;
+    @Override
+    public String getType() {
+        return null;
     }
+
 }

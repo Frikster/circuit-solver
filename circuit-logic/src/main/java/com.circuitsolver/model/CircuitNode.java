@@ -1,4 +1,4 @@
-package model;
+package com.circuitsolver.model;
 
 /**
  * Created by Jennifer on 10/10/2016.
