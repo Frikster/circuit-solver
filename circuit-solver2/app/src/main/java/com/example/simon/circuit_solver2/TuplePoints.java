@@ -3,7 +3,7 @@ package com.example.simon.circuit_solver2;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/**Class to be able to return two elements at the time
  * Created by Simon on 21.10.2016.
  */
 

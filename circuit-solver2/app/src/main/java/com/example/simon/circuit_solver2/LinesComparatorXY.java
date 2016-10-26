@@ -2,8 +2,11 @@ package com.example.simon.circuit_solver2;
 
 import java.util.Comparator;
 
-/**
- * Created by Simon on 21.10.2016.
+/**Class to compare two lines.
+ * First criteria : the starting x coordinate of the line
+ * Second criteria : the starting y coordinate of the line
+ * Sorts from smallest to biggest.
+ * Created by Simon on 19.10.2016.
  */
 
 public class LinesComparatorXY  implements Comparator<double[]> {
