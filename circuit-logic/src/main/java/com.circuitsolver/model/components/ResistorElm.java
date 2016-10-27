@@ -1,6 +1,10 @@
 package com.circuitsolver.model.components;
 
 
+import com.circuitsolver.util.Constants;
+
+import java.awt.*;
+
 /**
  * Created by Jennifer on 10/12/2016.
  */
@@ -8,7 +12,8 @@ public class ResistorElm extends CircuitElm {
 
     private double resistance;
 
-    public ResistorElm(double resistance){
+    public ResistorElm(Point p1, Point p2, double resistance){
+        super(p1, p2);
         this.resistance = resistance;
     }
 
@@ -26,7 +31,7 @@ public class ResistorElm extends CircuitElm {
 
     @Override
     public String getType() {
-        return null;
+        return Constants.RESISTOR;
     }
 
 }

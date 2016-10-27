@@ -1,5 +1,9 @@
 package com.circuitsolver.model.components;
 
+import com.circuitsolver.util.Constants;
+
+import java.awt.*;
+
 /**
  * Created by Jennifer on 10/12/2016.
  */
@@ -7,7 +11,8 @@ public class VoltageElm extends CircuitElm {
 
     private double voltage;
 
-    public VoltageElm(double voltage){
+    public VoltageElm(Point p1, Point p2, double voltage){
+        super(p1, p2);
         this.voltage = voltage;
     }
 
@@ -25,7 +30,7 @@ public class VoltageElm extends CircuitElm {
 
     @Override
     public String getType() {
-        return null;
+        return Constants.DC_VOLTAGE;
     }
 
 }

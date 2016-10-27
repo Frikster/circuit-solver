@@ -9,20 +9,16 @@ import java.awt.*;
  */
 public abstract class CircuitElm {
 
-    protected CircuitNode n1, n2;
-    protected Point p1, p2;
+    //protected CircuitNode[] nodes;
+    protected CircuitNode n1;
+    protected CircuitNode n2;
+    protected Point[] posts;
 
     public CircuitElm(Point p1, Point p2){
-        this.p1 = p1;
-        this.p2 = p2;
-    }
-
-    /**
-     * Initializes circuitNodes
-     */
-    public void initNodes(CircuitNode n1, CircuitNode n2){
-        this.n1 = n1;
-        this.n2 = n2;
+        posts = new Point[2];
+        //nodes = new CircuitNode[2];
+        posts[0] = p1;
+        posts[1] = p2;
     }
 
     /**
@@ -49,38 +45,60 @@ public abstract class CircuitElm {
      */
     public abstract String getType();
 
+    /**
+     * Returns index of node corresponding to given node, else -1 if element does not correspond to node
+     * @param node
+     * @return
+     */
+    public int indexOfNode(CircuitNode node){
+        if(node.equals(n1))
+            return 0;
+        else if (node.equals(n2))
+            return 1;
+
+        return -1;
+    }
+
     /*    Getters and Setters     */
 
-    public CircuitNode getN1() {
-        return n1;
+    /**
+     *
+     * @param i
+     *      Requires i = 0 or 1
+     * @param node
+     */
+    public void setNode(int i, CircuitNode node){
+        if(i == 0)
+            n1 = node;
+        if(i == 1)
+            n2 = node;
     }
 
-    public void setN1(CircuitNode n1) {
-        this.n1 = n1;
+    /**
+     *
+     * @param i
+     *      Requires i <= 2
+     * @return Node corresonding to index i, null if no node corresponds to i
+     */
+    public CircuitNode getNode(int i){
+        if(i == 0)
+            return n1;
+        else if(i == 1)
+            return n2;
+        return null;
     }
 
-    public CircuitNode getN2() {
-        return n2;
+    public int getNumPosts(){
+        return 2;
     }
 
-    public void setN2(CircuitNode n2) {
-        this.n2 = n2;
-    }
-
-    public Point getP1() {
-        return p1;
-    }
-
-    public void setP1(Point p1) {
-        this.p1 = p1;
-    }
-
-    public Point getP2() {
-        return p2;
-    }
-
-    public void setP2(Point p2) {
-        this.p2 = p2;
+    public Point getPost(int i){
+        if(i < posts.length){
+            return posts[i];
+        }
+        else{
+            return null; //TODO: throw an exception instead?
+        }
     }
 
 }
