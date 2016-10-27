@@ -3,6 +3,8 @@ package com.circuitsolver.model.components;
 import com.circuitsolver.model.CircuitNode;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jennifer on 10/10/2016.
@@ -10,15 +12,15 @@ import java.awt.*;
 public abstract class CircuitElm {
 
     //protected CircuitNode[] nodes;
-    protected CircuitNode n1;
-    protected CircuitNode n2;
-    protected Point[] posts;
+    private CircuitNode n1;
+    private CircuitNode n2;
+
+    private Point p1;
+    private Point p2;
 
     public CircuitElm(Point p1, Point p2){
-        posts = new Point[2];
-        //nodes = new CircuitNode[2];
-        posts[0] = p1;
-        posts[1] = p2;
+        this.p1 = p1;
+        this.p2 = p2;
     }
 
     /**
@@ -88,17 +90,23 @@ public abstract class CircuitElm {
         return null;
     }
 
-    public int getNumPosts(){
+    public int getNumPoints(){
         return 2;
     }
 
-    public Point getPost(int i){
-        if(i < posts.length){
-            return posts[i];
-        }
-        else{
-            return null; //TODO: throw an exception instead?
-        }
+    public Point getPoint(int i){
+        if(i == 0)
+            return p1;
+        if(i == 1)
+            return p2;
+        return null;
+    }
+
+    public List<CircuitNode> getNodes(){
+        List<CircuitNode> nodes = new ArrayList<CircuitNode>();
+        nodes.add(n1);
+        nodes.add(n2);
+        return nodes;
     }
 
 }

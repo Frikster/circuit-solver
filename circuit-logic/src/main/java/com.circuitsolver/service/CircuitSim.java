@@ -35,35 +35,46 @@ public class CircuitSim {
         for(CircuitElm e: elements){
             //Wire elements are technically part of one node (voltage is the same at both ends)
             if(e.getType().equals(Constants.WIRE)){
-                Point p1 = e.getPost(0);
-                Point p2 = e.getPost(1);
+                Point p1 = e.getPoint(0);
+                Point p2 = e.getPoint(1);
+                CircuitNode cn;
                 //if p1 corresponds to node but p2 doesn't, then add p2 to corresponding node
                 if(nodesContainPoint(p1) && !nodesContainPoint(p2)) {
-                    getNodeWithPoint(p1).addPoint(p2);
+                    cn = getNodeWithPoint(p1);
+                    cn.addPoint(p2);
                 }
                 //if p2 corresponds to node but p1 doesn't, then add p1 to corresponding node
                 else if(nodesContainPoint(p2) && !nodesContainPoint(p1)) {
-                    getNodeWithPoint(p2).addPoint(p1);
+                    cn = getNodeWithPoint(p2);
+                    cn.addPoint(p1);
                 }
                 //if p1 and p2 correspond to unique nodes, merge nodes
                 else if(nodesContainPoint(p2) && nodesContainPoint(p1) && !getNodeWithPoint(p1).equals(getNodeWithPoint(p2))) {
                     CircuitNode n1 = getNodeWithPoint(p1);
                     CircuitNode n2 = getNodeWithPoint(p2);
-                    mergeNodes(n1, n2);
+                    cn = mergeNodes(n1, n2);
                 }
                 //if p1 and p2 do not correspond to any nodes, create new node corresponding to both points
                 else if(!nodesContainPoint(p1) && !nodesContainPoint(p2)){
-                    CircuitNode cn = new CircuitNode();
+                    cn = new CircuitNode();
                     cn.addPoint(p1);
                     cn.addPoint(p2);
+                    nodes.add(cn);
                 }
-                //if p1 and p2 correspond ot same node, no need to do anything
+                //if p1 and p2 correspond to same node, no need to do anything
+                else{
+                    cn = getNodeWithPoint(p1);
+                }
+
+                //Both ends of the wire are connected to the same node
+                e.setNode(0, cn);
+                e.setNode(1, cn);
 
             }
             //Handle node allocation for all circuit elements other than wires...
             else{
-                for(int i = 0; i < e.getNumPosts(); i++){
-                    Point p = e.getPost(i);
+                for(int i = 0; i < e.getNumPoints(); i++){
+                    Point p = e.getPoint(i);
                     CircuitNode cn;
                     if(nodesContainPoint(p)){
                         cn = getNodeWithPoint(p);
@@ -104,7 +115,7 @@ public class CircuitSim {
         return null;
     }
 
-    private void mergeNodes(CircuitNode n1, CircuitNode n2){
+    private CircuitNode mergeNodes(CircuitNode n1, CircuitNode n2){
         //Add all the points corresponding to n2 to n1
         for(Point p: n2.getPoints()){
             n1.addPoint(p);
@@ -116,9 +127,9 @@ public class CircuitSim {
                 e.setNode(index, n1);
             }
         }
-
         //Delete n2
         nodes.remove(n2);
+        return n1;
     }
 
     /**

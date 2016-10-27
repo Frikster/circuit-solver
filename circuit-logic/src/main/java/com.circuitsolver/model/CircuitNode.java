@@ -4,6 +4,7 @@ import com.circuitsolver.model.components.CircuitElm;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -52,12 +53,17 @@ public class CircuitNode {
         points.add(p);
     }
 
-    public void addPoints(List<Point> p){
-        //TODO: implement this method
+    /**
+     * Appends the points to CircuitNode's list of points
+     * @param points
+     */
+    public void addPoints(List<Point> points){
+        //Rep invariant: parameter points should not be modified
+        this.points.addAll(points);
     }
 
     public List<Point> getPoints(){
-        return new ArrayList<Point>(points);
+        return Collections.unmodifiableList(points);
     }
 
     @Override
